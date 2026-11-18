@@ -315,7 +315,7 @@ def run():
     global root
     root = tkinter.Tk()
     root.title( 'Crawler GUI' )
-    root.resizable( 0, 0 )
+    root.resizable( 1, 1 )
 
 #  root.mainloop()
 

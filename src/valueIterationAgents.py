@@ -15,7 +15,20 @@ from learningAgents import ValueEstimationAgent
 from copy import deepcopy
 from random import random  # noqa
 from util import Counter
+"""
+MAX RETURN 0.9**5 
+Started in state: (3, 2)
+Took action: exit
+Ended in state: TERMINAL_STATE
+Got reward: 1
 
+EPISODE 1 COMPLETE: RETURN WAS 0.5904900000000002
+
+
+AVERAGE RETURNS FROM START STATE: 0.5904900000000002
+
+
+"""
 
 class ValueIterationAgent(ValueEstimationAgent):
     """
@@ -49,20 +62,19 @@ class ValueIterationAgent(ValueEstimationAgent):
             Implements Bellman's equation
         """
         for iteration in range(iterations):
-            new_values = deepcopy(self.values)
-            for state in self.states:
-                new_values[state] = float("-inf")
-                sum_v = 0
-
-                for action in self.mdp.getPossibleActions(state):
-                    sum_v = self.computeQValueFromValues(state, action)
-
-                    if sum_v > new_values[state]:
-                        new_values[state] = sum_v
-
-                if new_values[state] == float('-inf'):
-                    new_values[state] = 0
-            self.values = new_values
+            valuesCopy = Counter()
+            for state in self.mdp.getStates():
+                if self.mdp.isTerminal(state):
+                    valuesCopy[state] = 0
+                    continue
+                actions = self.mdp.getPossibleActions(state)
+                qValues = []
+                for action in actions:
+                    qValues.append(
+                        self.computeQValueFromValues(state, action)
+                    )
+                valuesCopy[state] = max(qValues)
+            self.values = valuesCopy
 
     def is_state_pre_terminal(self, state):
         for action in self.mdp.getPossibleActions(state):
@@ -92,9 +104,6 @@ class ValueIterationAgent(ValueEstimationAgent):
           Compute the Q-value of action in state from the
           value function stored in self.values.
         """
-        if self.mdp.isTerminal(state):
-            return 0.0
-
         q_value = 0.0
         probabilities = self.mdp.getTransitionStatesAndProbs(state, action)
         for possible_state, probability in probabilities:
